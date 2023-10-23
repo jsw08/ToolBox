@@ -1,7 +1,7 @@
 <script>
   import { draggable } from "@neodrag/svelte";
   import { openApps } from "../store";
-  
+
   /**
    * Window title.
    * @type string
@@ -38,8 +38,8 @@
       size = oldSize;
     } else {
       oldPosition = position;
-      oldSize = {...size};
-      position = {x: 0, y: 0}
+      oldSize = { ...size };
+      position = { x: 0, y: 0 };
       fullscreen = true;
     }
   };
@@ -47,46 +47,52 @@
   /**
    * Window position
    * @typedef {{x: number, y: number}} Position
-   * @type Position 
+   * @type Position
    **/
   let position = {
     x: window.innerWidth / 6,
     y: window.innerHeight / 6,
-  }
+  };
 
-  /** 
+  /**
    * Stores the position before fullscreen
    * @type Position
-  **/
+   **/
   let oldPosition;
 
   /**
    * Window size
    * @typedef {{w: number, h: number}} Size
    * @type Size
-  **/
+   **/
   let size = {
     w: (window.innerWidth / 3) * 2,
     h: (window.innerHeight / 3) * 2,
-  }
+  };
 
   /**
    * Stores the window size before fullscreen
    * @type Size
-  **/
+   **/
   let oldSize;
 
   /**
    * Fullscreen state
    * @type boolean
-  **/
+   **/
   let fullscreen = false;
 
   /**
    * Capture mouse events
    * @type MouseEvent
-  **/
+   **/
   let mouseEvent;
+
+  /**
+   * Whether window is being dragged
+   * @type boolean
+   **/
+  let dragging = false;
 </script>
 
 <div
@@ -98,16 +104,23 @@
   use:draggable={{
     position,
     handle: ".titlebar",
-    onDrag: ({ offsetX, offsetY }) => {
-      position = {x: offsetX, y: offsetY };
-    },
-    disabled: fullscreen
+    disabled: fullscreen,
   }}
+  on:neodrag={(e) => (position = { x: e.offsetX, y: e.offsetY })}
+  on:neodrag:start={(e) => (dragging = true)}
+  on:neodrag:end={(e) => (dragging = false)}
 >
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="titlebar" on:mousemove={e => mouseEvent = e} style:pointer={fullscreen ? "grab" : "not-allowed"}>
-    <p {title}>{title}</p>
-    <div>
+  <div
+    class="titlebar"
+    on:mousemove={(e) => (mouseEvent = e)}
+    style:cursor={dragging ? "grabbing" : !fullscreen ? "grab" : "not-allowed"}
+  >
+    <div class="titlebarTitle">
+      <slot name="icon"/>
+      <p {title}>{title}</p>
+    </div>
+    <div class="titlebarButtons">
       <button on:click={toggleFullscreen}>
         {#if fullscreen}
           <svg
@@ -163,7 +176,7 @@
       >
     </div>
   </div>
-  <div class="windowContent"></div>
+  <div class="windowContent"><slot/></div>
 </div>
 
 <style>
@@ -179,8 +192,9 @@
     flex-direction: column;
     overflow: auto;
     resize: both;
-
     border: 1px solid black;
+    border-radius: 8px;
+    background-color: white;
   }
 
   .titlebar {
@@ -193,21 +207,29 @@
     justify-content: space-between;
   }
 
-  .titlebar p {
+  .titlebarTitle {
     flex-grow: 1;
+    place-items: center;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .titlebarTitle p {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    place-self: center;
+    all: unset;
   }
 
-  .titlebar div {
+  .titlebarButtons{
     display: flex;
     flex: none;
     flex-direction: row;
+    cursor: pointer;
   }
 
-  .titlebar button {
+  .titlebarButtons button {
     width: 24px;
     height: 24px;
     all: unset;
