@@ -14,6 +14,7 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "@neodrag/svelte": "^2.0.3"
+    "@neodrag/svelte": "^2.0.3",
+    "vite-plugin-css-injected-by-js": "^3.3.0"
   }
 }
