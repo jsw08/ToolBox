@@ -19,10 +19,11 @@
   } @ inputs: let
     forEachSystem = nixpkgs.lib.genAttrs (import systems);
   in {
+    formatter = forEachSystem (system: nixpkgs.legacyPackages.${system}.prettier);
     devShells =
       forEachSystem
       (system: let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = nixpkgs.legacyPackages.${system}.nodePackages.prettier;
       in {
         default = devenv.lib.mkShell {
           inherit inputs pkgs;
@@ -32,6 +33,7 @@
                 enable = true;
                 corepack.enable = true;
               };
+              pre-commit.hooks.prettier.enable = true;
             }
           ];
         };

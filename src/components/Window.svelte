@@ -105,7 +105,7 @@
   }}
 >
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="titlebar" on:mousemove={e => mouseEvent = e} style:pointer={fullscreen?"grab":"not-allowed"}>
+  <div class="titlebar" on:mousemove={e => mouseEvent = e} style:pointer={fullscreen ? "grab" : "not-allowed"}>
     <p {title}>{title}</p>
     <div>
       <button on:click={toggleFullscreen}>
