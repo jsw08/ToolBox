@@ -1,7 +1,7 @@
 <script>
   import { draggable } from "@neodrag/svelte";
   import { openApps } from "../store";
-
+  
   /**
    * Window title.
    * @type string
@@ -25,73 +25,91 @@
   const close = () => {
     $openApps = $openApps.filter((v) => v.id != id);
   };
+
   /**
    * Sets the window to fullscreen mode
    * @function
    * @returns void
    **/
-  const fullscreen = () => {
-    /**
-     * Temporary variable for shorter code. Contains the fullscreen state. 
-     * @type boolean
-    **/
-    let fs = props.fullscreen;
-    oldProps = fs ? oldProps : props;
-    props = fs ? {
-      ...oldProps,
-      fullscreen: false
-    } : {
-      ...props,
-      x: 0,
-      y: 0,
-      fullscreen: true
+  const toggleFullscreen = () => {
+    if (fullscreen) {
+      fullscreen = false;
+      position = oldPosition;
+      size = oldSize;
+    } else {
+      oldPosition = position;
+      oldSize = {...size};
+      position = {x: 0, y: 0}
+      fullscreen = true;
     }
-    console.log(props)
   };
 
   /**
-   * Main properties of the window.
-   * @typedef {{x: number, y: number, w: number, h: number, fullscreen: boolean}} WindowProps
-   * @type WindowProps
+   * Window position
+   * @typedef {{x: number, y: number}} Position
+   * @type Position 
    **/
-  let props = {
+  let position = {
     x: window.innerWidth / 6,
     y: window.innerHeight / 6,
+  }
+
+  /** 
+   * Stores the position before fullscreen
+   * @type Position
+  **/
+  let oldPosition;
+
+  /**
+   * Window size
+   * @typedef {{w: number, h: number}} Size
+   * @type Size
+  **/
+  let size = {
     w: (window.innerWidth / 3) * 2,
     h: (window.innerHeight / 3) * 2,
-    fullscreen: false,
-  };
+  }
+
   /**
-   * Window properties before fullscreen
-   * @type WindowProps
-   **/
-  let oldProps;
+   * Stores the window size before fullscreen
+   * @type Size
+  **/
+  let oldSize;
+
   /**
-   * Neodrag properties
-   * @type {import('@neodrag/svelte').DragOptions}
-   **/
-  let dragOptions = {
-    position: props,
-    handle: ".titlebar",
-    onDrag: ({ offsetX, offsetY }) => {
-      props = { ...props, x: offsetX, y: offsetY };
-    },
-  };
+   * Fullscreen state
+   * @type boolean
+  **/
+  let fullscreen = false;
+
+  /**
+   * Capture mouse events
+   * @type MouseEvent
+  **/
+  let mouseEvent;
 </script>
 
 <div
   class="window"
-  style:width="{props.w}px"
-  style:height="{props.h}px"
-  bind:clientWidth={props.w}
-  bind:clientHeight={props.h}
-  use:draggable={dragOptions}
+  style:width={fullscreen ? "100vw" : `${size.w}px`}
+  style:height={fullscreen ? "100vh" : `${size.h}px`}
+  bind:clientWidth={size.w}
+  bind:clientHeight={size.h}
+  use:draggable={{
+    position,
+    handle: ".titlebar",
+    onDrag: ({ offsetX, offsetY }) => {
+      position = {x: offsetX, y: offsetY };
+    },
+    disabled: fullscreen
+  }}
 >
-  <div class="titlebar">
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="titlebar" on:mousemove={e => mouseEvent = e} style:pointer={fullscreen?"grab":"not-allowed"}>
     <p {title}>{title}</p>
     <div>
-      <button on:click={fullscreen}>
-        {#if props.fullscreen}
+      <button on:click={toggleFullscreen}>
+        {#if fullscreen}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -145,7 +163,7 @@
       >
     </div>
   </div>
-  <div class="windowContent">x</div>
+  <div class="windowContent"></div>
 </div>
 
 <style>
@@ -197,6 +215,9 @@
 
   .windowContent {
     display: flex;
+    flex-grow: 1;
+  }
+  .windowContent > * {
     flex-grow: 1;
   }
 </style>
