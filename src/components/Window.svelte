@@ -97,6 +97,7 @@
 
 <div
   class="window"
+  style:border-radius={fullscreen ? "0px" : "12px"}
   style:width={fullscreen ? "100vw" : `${size.w}px`}
   style:height={fullscreen ? "100vh" : `${size.h}px`}
   bind:clientWidth={size.w}
@@ -193,7 +194,6 @@
     overflow: auto;
     resize: both;
     border: 1px solid black;
-    border-radius: 8px;
     background-color: white;
   }
 
