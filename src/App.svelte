@@ -1,4 +1,5 @@
 <script>
+  import AppLauncher from "./components/AppLauncher.svelte";
   import { openApps } from "./store";
 </script>
 
@@ -6,6 +7,7 @@
   {#each $openApps as openApp}
     <svelte:component this={openApp.app} id={openApp.id}/>
   {/each}
+  <AppLauncher/>
 </div>
 
 <style>
@@ -19,6 +21,6 @@
     width: 100vw;
     height: 100vh;
 
-    background-color: black;
+    background-color: rgb(43, 43, 43);
   }
 </style>

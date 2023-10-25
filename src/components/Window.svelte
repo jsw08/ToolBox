@@ -45,10 +45,16 @@
   };
 
   /**
-   * Window position
-   * @typedef {{x: number, y: number}} Position
-   * @type Position
+   * Position type for neodrag.
+   * @typedef Position
+   * @property {number} x - X coordinate
+   * @property {number} y - Y coordinate
    **/
+
+  /**
+   * Window position
+   * @type Position
+  **/
   let position = {
     x: window.innerWidth / 6,
     y: window.innerHeight / 6,
@@ -61,10 +67,17 @@
   let oldPosition;
 
   /**
+   * Size type for fullscreen.
+   * @typedef Size
+   * @property {number} w - Window width
+   * @property {number} h - Window height
+  **/
+
+  /**
    * Window size
-   * @typedef {{w: number, h: number}} Size
    * @type Size
    **/
+
   let size = {
     w: (window.innerWidth / 3) * 2,
     h: (window.innerHeight / 3) * 2,
@@ -97,7 +110,7 @@
 
 <div
   class="window"
-  style:border-radius={fullscreen ? "0px" : "12px"}
+  style:border-radius={fullscreen ? "0px" : "8px"}
   style:width={fullscreen ? "100vw" : `${size.w}px`}
   style:height={fullscreen ? "100vh" : `${size.h}px`}
   bind:clientWidth={size.w}
@@ -130,7 +143,7 @@
             height="24"
             viewBox="0 0 24 24"
             ><g
-              fill="none"
+              fill="white"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -147,7 +160,7 @@
             height="24"
             viewBox="0 0 24 24"
             ><g
-              fill="none"
+              fill="white"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -159,14 +172,14 @@
           >
         {/if}
       </button>
-      <button on:click={close}
+      <button on:click={close} id="closeBtn"
         ><svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
           viewBox="0 0 24 24"
           ><path
-            fill="none"
+            fill="white"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -202,9 +215,9 @@
     flex: none;
     display: flex;
     flex-direction: row;
-    border-bottom: 1px solid black;
-    padding: 0 2px;
     justify-content: space-between;
+    padding: 2px;
+    background-color: #f1f5f9;
   }
 
   .titlebarTitle {
@@ -226,18 +239,29 @@
     display: flex;
     flex: none;
     flex-direction: row;
+    gap: 2px;
     cursor: pointer;
+    margin-top: -4px; /* extends the border to the top of the window. */
+    padding-top: 3px;  /* recenter the children */
   }
 
   .titlebarButtons button {
-    width: 24px;
+    width: 48px;
     height: 24px;
     all: unset;
+  }
+  .titlebarButtons svg {
+    shape-rendering: crispEdges;
+  }
+
+  #closeBtn:hover path{
+    fill: #fca5a5;
   }
 
   .windowContent {
     display: flex;
     flex-grow: 1;
+    padding: 2px;
   }
   .windowContent > * {
     flex-grow: 1;

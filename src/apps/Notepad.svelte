@@ -32,11 +32,9 @@
 </Window>
 
 <style>
-    * {
-        all: unset;
-    }
     textarea {
         flex-grow: 1;
         white-space: pre;
+        all: unset;
     }
 </style>
