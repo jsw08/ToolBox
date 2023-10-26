@@ -1,4 +1,6 @@
 <script>
+  import Notepad from "../apps/Notepad.svelte";
+
     /**
      * The menu items.
      * @type Directory
@@ -6,21 +8,38 @@
     export let rootDir = {
         "title": "The root dir.",
         "type": "d",
-        "items": []
+        "items": [
+            {
+                "type": "a",
+                "title": "temp",
+                "component": Notepad
+            },
+            {
+                "type": "d",
+                "title": "temp",
+                "items": [
+                    {
+                        "type": "a",
+                        "title": "temp",
+                        "component": Notepad
+                    },
+                ]
+            }
+        ]
     };
     
     /**
      * @typedef {Object} Application
-     * @property {string} type - Start menu item
+     * @property {"a"} type - Start menu item a
      * @property {string} title - The title
      * @property {ConstructorOfATypedSvelteComponent} component - The Svelte component for the application.
      */
 
     /**
      * @typedef {Object} Directory
-     * @property {"d" | "a"} type - Start menu directory
+     * @property {"d"} type - Start menu directory
      * @property {string} title - Directory name
-     * @property {Application | Directory []} items - Directory items
+     * @property {Array<Application | Directory>} items - Directory items
      */
 
     /**
@@ -64,7 +83,11 @@
 </script>
 
 {#if open}
-    <div class="appMenu" />
+    <div class="appMenu"> 
+        {#each directoryPath[currentDirectory].items as item}
+            <button>{item.title}</button> 
+        {/each}
+    </div>
 {/if}
 <button on:click={(e) => (open = !open)}>+</button>
 
@@ -93,5 +116,10 @@
         background-color: white;
         min-height: 12rem;
         min-width: 6rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .appMenu > button {
+        border: 1px solid black;
     }
 </style>
