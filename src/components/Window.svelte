@@ -1,6 +1,6 @@
 <script>
   import { draggable } from "@neodrag/svelte";
-  import { openApps } from "../store";
+  import { focusId, openApps, rootElement } from "../store";
 
   /**
    * Window title.
@@ -10,7 +10,7 @@
 
   /**
    * Window id, used for closing window.
-   * @type string
+   * @type number
    **/
   export let id;
   if (id === undefined) {
@@ -37,7 +37,7 @@
       position = oldPosition;
       size = oldSize;
     } else {
-      oldPosition = position;
+      oldPosition = { ...position };
       oldSize = { ...size };
       position = { x: 0, y: 0 };
       fullscreen = true;
@@ -54,7 +54,7 @@
   /**
    * Window position
    * @type Position
-  **/
+   **/
   let position = {
     x: window.innerWidth / 6,
     y: window.innerHeight / 6,
@@ -71,7 +71,7 @@
    * @typedef Size
    * @property {number} w - Window width
    * @property {number} h - Window height
-  **/
+   **/
 
   /**
    * Window size
@@ -113,16 +113,20 @@
   style:border-radius={fullscreen ? "0px" : "8px"}
   style:width={fullscreen ? "100vw" : `${size.w}px`}
   style:height={fullscreen ? "100vh" : `${size.h}px`}
+  style:z-index={$focusId === id ? "2" : "initial"}
+  on:pointerenter={() => $focusId = id}
   bind:clientWidth={size.w}
   bind:clientHeight={size.h}
   use:draggable={{
     position,
     handle: ".titlebar",
     disabled: fullscreen,
+    bounds: $rootElement,
   }}
   on:neodrag={(e) => (position = { x: e.offsetX, y: e.offsetY })}
   on:neodrag:start={(e) => (dragging = true)}
   on:neodrag:end={(e) => (dragging = false)}
+  
 >
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
@@ -131,7 +135,7 @@
     style:cursor={dragging ? "grabbing" : !fullscreen ? "grab" : "not-allowed"}
   >
     <div class="titlebarTitle">
-      <slot name="icon"/>
+      <slot name="icon" />
       <p {title}>{title}</p>
     </div>
     <div class="titlebarButtons">
@@ -190,7 +194,7 @@
       >
     </div>
   </div>
-  <div class="windowContent"><slot/></div>
+  <div class="windowContent"><slot /></div>
 </div>
 
 <style>
@@ -235,14 +239,14 @@
     all: unset;
   }
 
-  .titlebarButtons{
+  .titlebarButtons {
     display: flex;
     flex: none;
     flex-direction: row;
     gap: 2px;
     cursor: pointer;
     margin-top: -4px; /* extends the border to the top of the window. */
-    padding-top: 3px;  /* recenter the children */
+    padding-top: 3px; /* recenter the children */
   }
 
   .titlebarButtons button {
@@ -254,7 +258,7 @@
     shape-rendering: crispEdges;
   }
 
-  #closeBtn:hover path{
+  #closeBtn:hover path {
     fill: #fca5a5;
   }
 

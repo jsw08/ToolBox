@@ -1,9 +1,9 @@
 <script>
   import AppLauncher from "./components/AppLauncher.svelte";
-  import { openApps } from "./store";
+  import { openApps, rootElement } from "./store";
 </script>
 
-<div>
+<div bind:this={$rootElement}>
   {#each $openApps as openApp}
     <svelte:component this={openApp.app} id={openApp.id}/>
   {/each}

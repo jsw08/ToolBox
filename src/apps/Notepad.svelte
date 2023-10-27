@@ -3,7 +3,7 @@
 
   /**
    * Window id, used for closing window.
-   * @type string
+   * @type number
    **/
   export let id;
 

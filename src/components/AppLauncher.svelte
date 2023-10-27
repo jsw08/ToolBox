@@ -1,5 +1,6 @@
 <script>
   import Notepad from "../apps/Notepad.svelte";
+  import { openApps } from "../store";
 
     /**
      * The menu items.
@@ -11,16 +12,16 @@
         "items": [
             {
                 "type": "a",
-                "title": "temp",
+                "title": "Temp",
                 "component": Notepad
             },
             {
                 "type": "d",
-                "title": "temp",
+                "title": "tempa",
                 "items": [
                     {
                         "type": "a",
-                        "title": "temp",
+                        "title": "Tempa",
                         "component": Notepad
                     },
                 ]
@@ -52,7 +53,7 @@
      * The currently open directory index.
      * @type number
      **/
-    let currentDirectory;
+    let currentDirectory = 0;
 
     /**
      * Whether the startmenu is open.
@@ -63,9 +64,8 @@
     /**
      * Go back to the parent directory.
      * @returns void
-     * @param {PointerEvent} e
      **/
-    const prevDirectory = (e) => {
+    const prevDirectory = () => {
         directoryPath.length === 1 ? void 0 : directoryPath.pop();
         currentDirectory = directoryPath.length - 1;
         void 0;
@@ -77,26 +77,44 @@
      * @param {Directory} dir
      **/
     const openDirectory = (dir) => {
-        currentDirectory = directoryPath.push(dir);
+        directoryPath.push(dir);
+        currentDirectory = directoryPath.length -1;
         void 0;
     };
+
+    /**
+     * Menu item event handler
+     * @param {Directory | Application} item
+     * @return void
+    **/
+    const btnHandler = (item) => {
+        if (item.type === "a") {
+            $openApps = [...$openApps, {app: item.component, id: performance.now()}];
+            open = false;
+        } else {
+            openDirectory(item)
+        }
+    }
 </script>
 
 {#if open}
     <div class="appMenu"> 
+        {#if ( currentDirectory > 0 )}
+            <button on:click={prevDirectory}>Back</button> 
+        {/if}
         {#each directoryPath[currentDirectory].items as item}
-            <button>{item.title}</button> 
+            <button on:click={e => btnHandler(item)}>{item.title}</button> 
         {/each}
     </div>
 {/if}
-<button on:click={(e) => (open = !open)}>+</button>
+<button id="toggleBtn" on:click={(e) => (open = !open)}>+</button>
 
 <style>
     * {
         all: unset;
         pointer-events: all;
     }
-    button {
+    #toggleBtn {
         position: fixed;
         right: 0;
         bottom: 0;
@@ -111,13 +129,12 @@
 
     .appMenu {
         position: fixed;
-        bottom: 24px;
+        bottom: 26px;
         right: 0px;
         background-color: white;
-        min-height: 12rem;
         min-width: 6rem;
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
     .appMenu > button {
         border: 1px solid black;
