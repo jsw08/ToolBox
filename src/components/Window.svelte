@@ -18,33 +18,6 @@
   }
 
   /**
-   * Closes the winodw.
-   * @function
-   * @returns void
-   **/
-  const close = () => {
-    $openApps = $openApps.filter((v) => v.id != id);
-  };
-
-  /**
-   * Sets the window to fullscreen mode
-   * @function
-   * @returns void
-   **/
-  const toggleFullscreen = () => {
-    if (fullscreen) {
-      fullscreen = false;
-      position = oldPosition;
-      size = oldSize;
-    } else {
-      oldPosition = { ...position };
-      oldSize = { ...size };
-      position = { x: 0, y: 0 };
-      fullscreen = true;
-    }
-  };
-
-  /**
    * Position type for neodrag.
    * @typedef Position
    * @property {number} x - X coordinate
@@ -59,12 +32,6 @@
     x: window.innerWidth / 6,
     y: window.innerHeight / 6,
   };
-
-  /**
-   * Stores the position before fullscreen
-   * @type Position
-   **/
-  let oldPosition;
 
   /**
    * Size type for fullscreen.
@@ -84,12 +51,6 @@
   };
 
   /**
-   * Stores the window size before fullscreen
-   * @type Size
-   **/
-  let oldSize;
-
-  /**
    * Fullscreen state
    * @type boolean
    **/
@@ -106,6 +67,37 @@
    * @type boolean
    **/
   let dragging = false;
+
+  /**
+   * Closes the winodw.
+   * @function
+   * @returns void
+   **/
+  const close = () => {
+    $openApps = $openApps.filter((v) => v.id != id);
+  };
+
+  /**
+   * Sets the window to fullscreen mode
+   * @function
+   * @returns void
+   **/
+  const toggleFullscreen = () => {
+    if (fullscreen) {
+      fullscreen = false;
+      position = {
+        x: window.innerWidth / 6,
+        y: window.innerHeight / 6,
+      };
+      size = {
+        w: (window.innerWidth / 3) * 2,
+        h: (window.innerHeight / 3) * 2,
+      };
+    } else {
+      position = { x: 0, y: 0 };
+      fullscreen = true;
+    }
+  };
 </script>
 
 <div
@@ -113,8 +105,8 @@
   style:border-radius={fullscreen ? "0px" : "8px"}
   style:width={fullscreen ? "100vw" : `${size.w}px`}
   style:height={fullscreen ? "100vh" : `${size.h}px`}
-  style:z-index={$focusId === id ? "2" : "initial"}
-  on:pointerenter={() => $focusId = id}
+  style:z-index={dragging ? "3" : $focusId === id ? "2" : "initial"}
+  on:pointerenter={() => ($focusId = id)}
   bind:clientWidth={size.w}
   bind:clientHeight={size.h}
   use:draggable={{
@@ -126,7 +118,6 @@
   on:neodrag={(e) => (position = { x: e.offsetX, y: e.offsetY })}
   on:neodrag:start={(e) => (dragging = true)}
   on:neodrag:end={(e) => (dragging = false)}
-  
 >
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
@@ -198,20 +189,21 @@
 </div>
 
 <style>
-  :not(svg|*) {
+  *:not(path, g) {
     all: unset;
-  }
-  * {
-    pointer-events: all;
   }
 
   .window {
+    position: absolute;
     display: flex;
     flex-direction: column;
     overflow: auto;
     resize: both;
     border: 1px solid black;
     background-color: white;
+    pointer-events: all;
+    min-width: 54px;
+    min-height: 54px;
   }
 
   .titlebar {
@@ -236,7 +228,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    all: unset;
   }
 
   .titlebarButtons {
@@ -250,12 +241,8 @@
   }
 
   .titlebarButtons button {
-    width: 48px;
+    width: 24px;
     height: 24px;
-    all: unset;
-  }
-  .titlebarButtons svg {
-    shape-rendering: crispEdges;
   }
 
   #closeBtn:hover path {
@@ -263,11 +250,27 @@
   }
 
   .windowContent {
-    display: flex;
     flex-grow: 1;
     padding: 2px;
   }
-  .windowContent > * {
-    flex-grow: 1;
+
+  @media (prefers-color-scheme: dark) {
+    .window {
+      background-color: black;
+      color: white;
+    }
+    .windowContent {
+      filter: invert(0%);
+    }
+    .titlebar {
+      background-color: #0f172a;
+    }
+    path {
+      stroke: white;
+      fill: black;
+    }
+    #closeBtn:hover path {
+      fill: #991b1b;
+    }
   }
 </style>

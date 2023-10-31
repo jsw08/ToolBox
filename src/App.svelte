@@ -1,6 +1,10 @@
 <script>
   import AppLauncher from "./components/AppLauncher.svelte";
   import { openApps, rootElement } from "./store";
+
+  const apps = {
+
+  }
 </script>
 
 <div bind:this={$rootElement}>
@@ -20,7 +24,5 @@
     pointer-events: none;
     width: 100vw;
     height: 100vh;
-
-    background-color: rgb(43, 43, 43);
   }
 </style>
