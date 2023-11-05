@@ -1,6 +1,6 @@
 <script>
   import { draggable } from "@neodrag/svelte";
-  import { focusId, openApps, rootElement } from "../store";
+  import { focusId, openApps, rootElement, windowDragging } from "../store";
 
   /**
    * Window title.
@@ -34,7 +34,7 @@
   };
 
   /**
-   * Size type for fullscreen.
+   * Size type to store window size.
    * @typedef Size
    * @property {number} w - Window width
    * @property {number} h - Window height
@@ -44,7 +44,6 @@
    * Window size
    * @type Size
    **/
-
   let size = {
     w: (window.innerWidth / 3) * 2,
     h: (window.innerHeight / 3) * 2,
@@ -69,6 +68,15 @@
   let dragging = false;
 
   /**
+   * Function to set the multiple dragging varaibles.
+   * @param {boolean} isDragging
+   **/
+  const setDrag = (isDragging) => {
+    dragging = isDragging;
+    $windowDragging = isDragging;
+  };
+
+  /**
    * Closes the winodw.
    * @function
    * @returns void
@@ -83,20 +91,21 @@
    * @returns void
    **/
   const toggleFullscreen = () => {
-    if (fullscreen) {
-      fullscreen = false;
-      position = {
-        x: window.innerWidth / 6,
-        y: window.innerHeight / 6,
-      };
-      size = {
-        w: (window.innerWidth / 3) * 2,
-        h: (window.innerHeight / 3) * 2,
-      };
-    } else {
+    if (!fullscreen) {
       position = { x: 0, y: 0 };
       fullscreen = true;
+      return;
     }
+
+    fullscreen = false;
+    position = {
+      x: window.innerWidth / 6,
+      y: window.innerHeight / 6,
+    };
+    size = {
+      w: (window.innerWidth / 3) * 2,
+      h: (window.innerHeight / 3) * 2,
+    };
   };
 </script>
 
@@ -116,8 +125,8 @@
     bounds: $rootElement,
   }}
   on:neodrag={(e) => (position = { x: e.offsetX, y: e.offsetY })}
-  on:neodrag:start={(e) => (dragging = true)}
-  on:neodrag:end={(e) => (dragging = false)}
+  on:neodrag:start={(e) => setDrag(true)}
+  on:neodrag:end={(e) => setDrag(false)}
 >
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
@@ -252,6 +261,7 @@
   .windowContent {
     flex-grow: 1;
     padding: 2px;
+    overflow: hidden;
   }
 
   @media (prefers-color-scheme: dark) {

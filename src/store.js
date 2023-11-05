@@ -5,7 +5,6 @@ import Notepad from "./apps/Notepad.svelte";
  * @typedef Application
  * @property {ConstructorOfATypedSvelteComponent} app - The svelte component.
  * @property {number} id - Unique app id that's used to close the application.
- *
  **/
 
 /**
@@ -26,3 +25,9 @@ export const rootElement = writable();
 
 **/
 export const focusId = writable();
+
+/**
+ * Contains whether any window is being dragged.
+ * @type {import('svelte/store').Writable<boolean>}
+ **/
+export const windowDragging = writable(false);

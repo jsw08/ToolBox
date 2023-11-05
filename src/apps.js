@@ -1,4 +1,5 @@
 import Notepad from "./apps/Notepad.svelte";
+import Poom from "./apps/Poom.svelte";
 
 /**
  * @typedef {Object} Application
@@ -30,7 +31,13 @@ export const rootDir = {
     {
       title: "Games",
       type: "d",
-      items: [],
+      items: [
+        {
+          type: "a",
+          title: "Poom",
+          component: Poom,
+        },
+      ],
     },
     {
       title: "Tools",
